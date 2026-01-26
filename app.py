@@ -1,6 +1,12 @@
 import streamlit as st
-from ui.prediction_ui import render_prediction_ui
-from ui.training_ui import render_training_ui
+from ui.page_1_overview import render_overview
+from ui.page_2_dataset import render_dataset
+from ui.page_3_architecture import render_architecture
+from ui.page_4_training import render_training
+from ui.page_5_experiments import render_experiments
+from ui.page_6_evaluation import render_evaluation
+from ui.page_7_prediction import render_prediction
+from ui.page_8_future import render_future_scope
 
 def load_css():
     st.markdown("""
@@ -113,27 +119,83 @@ def load_css():
         display: none;
     }
 
+    /* ===== METRIC CARDS ===== */
+    .metric-card {
+        background: rgba(255,255,255,0.08);
+        border-left: 4px solid #ff4b2b;
+        padding: 20px;
+        border-radius: 12px;
+        margin: 10px 0;
+    }
+
+    /* ===== TAB STYLING ===== */
+    [data-baseweb="tab-list"] {
+        background-color: transparent;
+    }
+
+    [data-baseweb="tab"] {
+        color: #f8fafc !important;
+        font-weight: 500;
+    }
+
+    [data-baseweb="tab"]:hover {
+        color: #ff4b2b !important;
+    }
+
+    [data-baseweb="tab"][aria-selected="true"] {
+        color: #ff4b2b !important;
+        border-bottom-color: #ff4b2b !important;
+    }
+
     </style>
     """, unsafe_allow_html=True)
 
 
 st.set_page_config(
-    page_title="Rare Disease AI Platform",
+    page_title="AI Medical Image Analysis System",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
 load_css()
 
-st.markdown("<h1>🧬 Generative AI–Driven Rare Disease Platform</h1>", unsafe_allow_html=True)
+st.markdown("<h1>🧬 AI-Based Medical Image Analysis System</h1>", unsafe_allow_html=True)
 st.markdown(
-    "A scalable, intelligent framework for rare disease diagnosis and synthetic data generation."
+    "Explaining the complete ML lifecycle: from problem definition to live prediction."
 )
 
-tab1, tab2 = st.tabs(["🔍 Prediction", "🧪 Training"])
+# Create 8 tabs for the complete journey
+tabs = st.tabs([
+    "📌 Project Overview",
+    "📊 Dataset Insights",
+    "⚙️ Architecture",
+    "🧠 Model Training",
+    "🧪 Experiments & Failures",
+    "📈 Evaluation",
+    "🖼️ Live Prediction",
+    "🚀 Future Scope"
+])
 
-with tab1:
-    render_prediction_ui()
+with tabs[0]:
+    render_overview()
 
-with tab2:
-    render_training_ui()
+with tabs[1]:
+    render_dataset()
+
+with tabs[2]:
+    render_architecture()
+
+with tabs[3]:
+    render_training()
+
+with tabs[4]:
+    render_experiments()
+
+with tabs[5]:
+    render_evaluation()
+
+with tabs[6]:
+    render_prediction()
+
+with tabs[7]:
+    render_future_scope()
