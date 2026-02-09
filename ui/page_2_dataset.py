@@ -84,9 +84,10 @@ def render_dataset():
             "Optic Glioma",
             "Tuberous Sclerosis"
         ],
-        "Real Images": [520, 580, 360, 440],
-        "Synthetic Images": [1208, 1340, 632, 888],
-        "Total Images": [1728, 1920, 992, 1328]
+        "Real Images": [ 480, 432, 332, 248],
+        "Synthetic Images": [ 480, 432, 332, 248],
+        "Total": [960, 864, 664, 496]
+
     }
 
     df_size = pd.DataFrame(size_data)

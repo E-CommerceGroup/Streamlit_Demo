@@ -3,183 +3,126 @@ import pandas as pd
 import numpy as np
 
 def render_evaluation():
-    """Page 6: Evaluation & Results – Medical AI Performance"""
+    """Evaluation & Results (Tables + Clean Academic Visuals)"""
 
     # ================= HEADER =================
-    st.markdown("""
-    <div class="card">
-        <h2>📈 Model Evaluation & Results</h2>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("## Model Evaluation and Results")
 
     st.markdown("""
-    **“In medical AI, evaluation is about trust, not just accuracy.”**
-
-    This section evaluates how reliably the model distinguishes  
-    **Disease vs Normal** cases under different conditions.
+    This section presents the experimental evaluation of the proposed
+    diffusion-based synthetic data augmentation framework combined with
+    a ResNet-18 classifier for rare brain disease classification.
     """)
 
-    # ================= OVERALL METRICS =================
-    st.markdown("""
-    <div class="card">
-        <h3>📊 Overall Performance Metrics</h3>
-    </div>
-    """, unsafe_allow_html=True)
+    # ================= FIGURE 3.1 DATASET =================
+    st.markdown("### Figure 3.1 Sample Dataset Distribution")
 
-    col1, col2, col3, col4 = st.columns(4)
+    dataset_df = pd.DataFrame({
+        "Disease Name": [
+            "Normal",
+            "NF1",
+            "Moyamoya",
+            "Tuberous Sclerosis",
+            "Optic Glioma"
+        ],
+        "Real Images": [794, 480, 432, 332, 248],
+        "Synthetic Images": [792, 480, 432, 332, 248]
+    }).set_index("Disease Name")
 
-    with col1:
-        st.metric("Accuracy", "90%", "+12% vs baseline")
+    st.table(dataset_df)
 
-    with col2:
-        st.metric("F1-Score", "0.91", "Balanced metric")
+    st.markdown("**Dataset Composition (Real vs Synthetic Images)**")
+    st.bar_chart(dataset_df)
 
-    with col3:
-        st.metric("Test Samples", "1,000", "Held-out data")
+    # ================= TRAINING DATA COMPARISON =================
+    st.markdown("### Performance Comparison Using Different Training Data")
 
-    with col4:
-        st.metric("Inference Time", "90 ms", "Per image (GPU)")
+    training_df = pd.DataFrame({
+        "Accuracy (%)": [91.3, 92.8],
+        "Recall (%)": [62.4, 84.7],
+        "F1-Score (%)": [68.1, 83.1]
+    }, index=[
+        "Imbalanced Real Data Only",
+        "Balanced Data (Real + Synthetic)"
+    ])
+
+    st.table(training_df)
+
+    st.markdown("**Metric-wise Performance Comparison**")
+    st.bar_chart(training_df)
+
+    # ================= AUGMENTATION METHOD COMPARISON =================
+    st.markdown("### Comparison of Synthetic Data Augmentation Methods")
+
+    augmentation_df = pd.DataFrame({
+        "Accuracy (%)": [91.9, 92.8],
+        "Recall (%)": [75.2, 84.7],
+        "F1-Score (%)": [74.6, 83.1]
+    }, index=[
+        "GAN-Based Synthetic Data",
+        "Diffusion-Based Synthetic Data (Proposed)"
+    ])
+
+    st.table(augmentation_df)
+
+    st.markdown("**GAN vs Diffusion-Based Augmentation Performance**")
+    st.line_chart(augmentation_df)
 
     # ================= CONFUSION MATRIX =================
-    st.markdown("""
-    <div class="card">
-        <h3>🔄 Confusion Matrix (Disease vs Normal)</h3>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("### Figure 6.6 Confusion Matrix (Five-Class Classification)")
 
-    cm = pd.DataFrame(
-        [[450, 50],
-         [40, 460]],
-        columns=["Predicted Normal", "Predicted Disease"],
-        index=["Actual Normal", "Actual Disease"]
+    cm = np.array([
+        [173, 0,   0,   0,   0],
+        [0,   189, 0,   0,   0],
+        [0,   2,   97,  0,   0],
+        [1,   0,   0,   132, 0],
+        [3,   0,   0,   1,   313]
+    ])
+
+    cm_df = pd.DataFrame(
+        cm,
+        columns=[
+            "Normal",
+            "NF1",
+            "Moyamoya",
+            "Tuberous Sclerosis",
+            "Optic Glioma"
+        ],
+        index=[
+            "Normal",
+            "NF1",
+            "Moyamoya",
+            "Tuberous Sclerosis",
+            "Optic Glioma"
+        ]
     )
 
-    col1, col2 = st.columns(2)
+    st.table(cm_df)
 
-    with col1:
-        st.dataframe(cm, width='stretch')
+    # ================= PER-CLASS CORRECT PREDICTIONS =================
+    st.markdown("### Class-wise Correct Predictions")
 
-    with col2:
-        st.markdown("""
-        **Interpretation (Medical Perspective):**
-        - **True Positives (460)**: Disease correctly detected
-        - **False Negatives (40)** ⚠️: Disease missed (critical risk)
-        - **False Positives (50)**: Normal flagged as disease
-        - **True Negatives (450)**: Normal correctly identified
+    correct_predictions = pd.DataFrame({
+        "Correct Predictions": np.diag(cm)
+    }, index=cm_df.index)
 
-        **Key Insight:**  
-        False negatives are minimized, which is crucial in medical screening.
-        """)
+    st.table(correct_predictions)
 
-    # ================= ROC CURVE =================
-    st.markdown("""
-    <div class="card">
-        <h3>📈 ROC Curve – Sensitivity vs Specificity</h3>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("**Correct Predictions per Class**")
+    st.bar_chart(correct_predictions)
 
-    fpr = np.linspace(0, 1, 50)
-    tpr = 1 - np.exp(-4 * fpr)  # Smooth realistic curve
-
-    roc_df = pd.DataFrame({
-        "False Positive Rate": fpr,
-        "True Positive Rate": tpr
-    })
-
-    st.line_chart(roc_df.set_index("False Positive Rate"))
+    # ================= FINAL INTERPRETATION =================
+    st.markdown("### Result Interpretation and Discussion")
 
     st.markdown("""
-    **ROC-AUC ≈ 0.93**
-
-    ✔ High area under curve  
-    ✔ Model separates disease from normal effectively  
-    ✔ Better than random guessing (AUC = 0.5)
+    The visual analysis clearly shows that balancing the dataset using
+    diffusion-based synthetic data leads to consistent improvements across
+    all evaluation metrics. The bar and line charts highlight the significant
+    gain in recall and F1-score, which is critical for rare disease diagnosis.
     """)
 
-    # ================= PR CURVE =================
     st.markdown("""
-    <div class="card">
-        <h3>📉 Precision–Recall Curve (Rare Disease Focus)</h3>
-    </div>
-    """, unsafe_allow_html=True)
-
-    recall = np.linspace(0, 1, 50)
-    precision = 1 / (1 + recall**1.5)
-
-    pr_df = pd.DataFrame({
-        "Recall": recall,
-        "Precision": precision
-    })
-
-    st.line_chart(pr_df.set_index("Recall"))
-
-    st.markdown("""
-    **Why PR Curve Matters More Than ROC Here:**
-    - Rare diseases are **minority class**
-    - High recall ensures fewer missed disease cases
-    - Precision controls false alarms
-    """)
-
-    # ================= THRESHOLD ANALYSIS =================
-    st.markdown("""
-    <div class="card">
-        <h3>⚖️ Threshold Sensitivity Analysis</h3>
-    </div>
-    """, unsafe_allow_html=True)
-
-    threshold_df = pd.DataFrame({
-        "Confidence Threshold": [0.40, 0.50, 0.60, 0.70, 0.80],
-        "Recall (Disease)": [0.95, 0.91, 0.87, 0.80, 0.72],
-        "Precision (Disease)": [0.78, 0.85, 0.89, 0.93, 0.96]
-    })
-
-    st.line_chart(threshold_df.set_index("Confidence Threshold"))
-
-    st.info("""
-    **Medical Trade-off Decision:**
-    - Lower threshold → fewer missed diseases
-    - Higher threshold → fewer false alarms
-
-    In clinical screening, **recall is prioritized over precision**.
-    """)
-
-    # ================= FINAL READINESS =================
-    st.markdown("""
-    <div class="card">
-        <h3>✅ Clinical Readiness Assessment</h3>
-    </div>
-    """, unsafe_allow_html=True)
-
-    readiness_df = pd.DataFrame({
-        "Criterion": [
-            "Accuracy",
-            "Disease Recall",
-            "False Negative Rate",
-            "Inference Speed",
-            "Generalization",
-            "Explainability",
-            "Clinical Validation"
-        ],
-        "Status": [
-            "90% ✅",
-            "92% ✅",
-            "Low (4%) ✅",
-            "<100 ms ✅",
-            "Stable across datasets ✅",
-            "Planned (Grad-CAM) ⏳",
-            "Pending expert review ⏳"
-        ]
-    })
-
-    st.dataframe(readiness_df, width='stretch')
-
-    st.success("""
-    **Final Evaluation Summary**
-
-    ✔ Model demonstrates strong disease detection capability  
-    ✔ Synthetic data significantly improves recall and robustness  
-    ✔ Suitable for **clinical decision support**, not autonomous diagnosis  
-
-    **Key Message:**  
-    The model is reliable enough to assist doctors, not replace them.
+    **Conclusion:**  
+    The proposed framework demonstrates reliable performance and improved
+    generalization, making it suitable for clinical decision support systems.
     """)
