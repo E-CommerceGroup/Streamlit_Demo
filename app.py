@@ -6,7 +6,7 @@ from ui.page_4_training import render_training
 from ui.page_5_experiments import render_experiments
 from ui.page_6_evaluation import render_evaluation
 from ui.page_7_prediction import render_prediction
-from ui.page_8_future import render_future_scope
+
 
 def load_css():
     st.markdown("""
@@ -173,7 +173,7 @@ tabs = st.tabs([
     "🧪 Experiments & Failures",
     "📈 Evaluation",
     "🖼️ Live Prediction",
-    "🚀 Future Scope"
+
 ])
 
 with tabs[0]:
@@ -197,5 +197,4 @@ with tabs[5]:
 with tabs[6]:
     render_prediction()
 
-with tabs[7]:
-    render_future_scope()
+

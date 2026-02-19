@@ -3,6 +3,7 @@ from PIL import Image
 import numpy as np
 
 from backend.config import CLASS_NAMES, MODEL_PATH
+from backend.models.brain_validator import validate_brain_image
 
 # Lazy imports - only load when needed
 torch = None
@@ -59,10 +60,25 @@ def _get_transform():
 # ===============================
 # PREDICTION FUNCTION (SAME AS COLAB)
 # ===============================
-def predict_image(pil_image: Image.Image):
+def predict_image(image_pil: Image.Image):
     """
-    Run inference exactly like Colab single-image prediction
+    Run inference with brain validation
     """
+    # ---------------------------------
+    # STEP 1: Brain Validation
+    # ---------------------------------
+    validation = validate_brain_image(image_pil)
+
+    if not validation["is_brain"]:
+        return {
+            "is_brain": False,
+            "message": "⚠️ Please upload a valid Brain MRI image.",
+            "confidence": validation["confidence"]
+        }
+
+    # ---------------------------------
+    # STEP 2: Disease Prediction
+    # ---------------------------------
     _init_torch()
     
     model = _load_model()
@@ -70,7 +86,7 @@ def predict_image(pil_image: Image.Image):
     transform = _get_transform()
 
     # Preprocess
-    image = pil_image.convert("RGB")
+    image = image_pil.convert("RGB")
     tensor = transform(image).unsqueeze(0).to(device)  # [1, 3, 224, 224]
 
     # Inference
@@ -84,6 +100,7 @@ def predict_image(pil_image: Image.Image):
     probs_np = probs[0].cpu().numpy()
 
     return {
+        "is_brain": True,
         "prediction": CLASS_NAMES[pred_idx],
         "confidence": confidence,  # 0–1 (multiply by 100 in UI if needed)
         "probabilities": {

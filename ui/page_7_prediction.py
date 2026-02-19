@@ -63,6 +63,11 @@ def render_prediction():
             with st.spinner("Running AI inference..."):
                 result = predict_image(image)
 
+            if not result.get("is_brain", True):
+                st.error(result["message"])
+                st.metric("Validation Confidence", f"{result['confidence']:.2%}")
+                return
+
             predicted_class = result["prediction"]
             confidence = result["confidence"]        # 0–1
             probabilities = result["probabilities"]

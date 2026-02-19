@@ -22,8 +22,8 @@ def render_architecture():
         
         # Display SVG in container
         html_content = f"""
-        <div style="background: white; border: 2px solid rgba(0, 153, 255, 0.3); border-radius: 16px; padding: 24px; margin: 20px 0;">
-            <div style="width: 100%; overflow: auto; border: 1px solid #e2e8f0; border-radius: 12px; background: white; max-height: 600px; display: flex; justify-content: center; align-items: flex-start;">
+        <div style="background: #1a1a1a; border: 2px solid rgba(0, 153, 255, 0.3); border-radius: 16px; padding: 24px; margin: 20px 0;">
+            <div style="width: 100%; overflow: auto; border: 1px solid #333333; border-radius: 12px; background: #1a1a1a; max-height: 600px; display: flex; justify-content: center; align-items: flex-start;">
                 {svg_content}
             </div>
         </div>

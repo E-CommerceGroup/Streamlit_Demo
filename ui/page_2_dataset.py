@@ -85,7 +85,7 @@ def render_dataset():
             "Tuberous Sclerosis"
         ],
         "Real Images": [ 480, 432, 332, 248],
-        "Synthetic Images": [ 480, 432, 332, 248],
+        "Synthetic Images": [480, 432, 332, 248],
         "Total": [960, 864, 664, 496]
 
     }
